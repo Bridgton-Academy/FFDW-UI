@@ -1,10 +1,115 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Component } from 'react';
 import './page.css';
 
 
-function Answers(){
+class TeamOnePoints extends React.Component {
+  render() {
+    return <p>Current Points</p>
+    
+  }
+}
+
+class TeamTwoPoints extends React.Component {
+  render() {
+    return <p>Current Points</p>
+    
+  }
+}
+
+class RoundNumber extends React.Component {
+  render() {
+    return <p>#</p>
+
+  }
+}
+
+class RoundPoints extends React.Component {
+  render() {
+    return <p>Pts Revealed</p>
+    
+  }
+}
+
+class AnswerOne extends React.Component {
+  render() {
+    return <p>Answer One</p>
+    
+  }
+}
+
+class AnswerTwo extends React.Component {
+  render() {
+    return <p>Answer Two</p>
+    
+  }
+}
+
+class AnswerThree extends React.Component {
+  render() {
+    return <p>Answer Three</p>
+    
+  }
+}
+
+class AnswerFour extends React.Component {
+  render() {
+    return <p>Answer Four</p>
+    
+  }
+}
+
+class AnswerFive extends React.Component {
+  render() {
+    return <p>Answer Five</p>
+    
+  }
+}
+
+class AnswerSix extends React.Component {
+  render() {
+    return <p>Answer Six</p>
+    
+  }
+}
+
+class AnswerSeven extends React.Component {
+  render() {
+    return <p>Answer Seven</p>
+    
+  }
+}
+
+class AnswerEight extends React.Component {
+  render() {
+    return <p>Answer Eight</p>
+    
+  }
+}
+
+class FirstStrike extends React.Component {
+  render() {
+    return <p>X</p>
+    
+  }
+}
+
+class SecondStrike extends React.Component {
+  render() {
+    return <p>X</p>
+    
+  }
+}
+
+class ThirdStrike extends React.Component {
+  render() {
+    return <p>X</p>
+    
+  }
+}
+
+function dataGrab(){
   const [data, setData] = useState(null);
   const username = 'drew';
   const password = 'Dv27232723';
@@ -17,11 +122,16 @@ function Answers(){
           'Authorization': `Basic ${base64_encoded_credentials}`
         }
       });   
-        const vals = await response.json();
+        const vals = await response.text();
+
+        // To Do: Parse vals into json and map over it to get the question and answers
+
         console.log(vals);
+        console.log(typeof(vals))
         console.log(vals[0]);
         console.log(vals[0].id);
-        var data = JSON.stringify(vals);
+        var data = JSON.parse();
+        console.log("data: ", data);
         setData(data);
     };
 
@@ -38,7 +148,6 @@ function Answers(){
 }
 
 
-
 export default function Page() {
   return (
     <body>
@@ -52,15 +161,15 @@ export default function Page() {
               Team 1
             </div>
             <div>
-              Current Points
+              <TeamOnePoints></TeamOnePoints>
             </div>
           </div>
           <div className="top-round-info">
-            <div>
-              Round #
+            <div className="round-number-area">
+              Round <RoundNumber></RoundNumber>
             </div>
             <div>
-              Pts Revealed
+              <RoundPoints></RoundPoints>
             </div>
           </div>
           <div className="top-teamtwo-points">
@@ -68,7 +177,7 @@ export default function Page() {
               Team 2
             </div>
             <div>
-              Current Points
+            <TeamTwoPoints></TeamTwoPoints>
             </div>
           </div>
       </div>
@@ -76,41 +185,41 @@ export default function Page() {
       <div className="bottom-section"> 
         <div className='left-questions-area'>
           <div>
-            <Answers></Answers>
+            <AnswerOne></AnswerOne>
           </div>
           <div>
-            Answer 2
+            <AnswerTwo></AnswerTwo>
           </div>
           <div>
-            Answer 3
+            <AnswerThree></AnswerThree>
           </div>
           <div>
-            Answer 4
+            <AnswerFour></AnswerFour>
           </div>
         </div>
         <div className="strikes-area">
           <div>
-            X
+            <FirstStrike></FirstStrike>
           </div>
           <div>
-            X
+            <SecondStrike></SecondStrike>
           </div>
           <div>
-            X
+            <ThirdStrike></ThirdStrike>
           </div>
         </div>
         <div className='right-questions-area'>
           <div>
-            Answer 5
+            <AnswerFive></AnswerFive>
           </div>
           <div>
-            Answer 6
+            <AnswerSix></AnswerSix>
           </div>
           <div>
-            Answer 7
+            <AnswerSeven></AnswerSeven>
           </div>
           <div>
-            Answer 8
+            <AnswerEight></AnswerEight>
           </div>
         </div>
       </div>
