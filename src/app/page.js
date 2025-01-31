@@ -105,17 +105,16 @@ class SecondStrike extends React.Component {
 class ThirdStrike extends React.Component {
   render() {
     return <p>X</p>
-    
   }
 }
 
-function dataGrab(){
-  const [data, setData] = useState(null);
-  const username = 'drew';
-  const password = 'Dv27232723';
-  const base64_encoded_credentials = btoa(`${username}:${password}`);
+function DataGrab(){
+  const [data, setState] = useState(dataCollect());
+  function dataCollect() {
+    const username = 'drew';
+    const password = 'Dv27232723';
+    const base64_encoded_credentials = btoa(`${username}:${password}`);
 
-  useEffect(() => {
     const fetchData = async () => {
       const response = await fetch('http://127.0.0.1:8000/question/', {
         headers: {
@@ -126,25 +125,17 @@ function dataGrab(){
 
         // To Do: Parse vals into json and map over it to get the question and answers
 
-        console.log(vals);
-        console.log(typeof(vals))
-        console.log(vals[0]);
-        console.log(vals[0].id);
-        var data = JSON.parse();
-        console.log("data: ", data);
-        setData(data);
+        
+        var data = JSON.parse(vals);
+        let dataArr = Object.values(data[0]);
+        console.log(data); 
+        // setState('test', data);
+        return(data);
     };
 
     fetchData();
-  }, []);
+  };
   
-  return (
-
-    <div>
-      {data ? <p>{data}</p> : <p>Loading...</p>}
-    </div>
-
-  );
 }
 
 
@@ -154,7 +145,7 @@ export default function Page() {
       <div className="ff-logo">
         <img src="./images/family-fued.png" alt="Family Fued Logo" />
       </div>
-
+      <DataGrab>data[0]</DataGrab>
       <div className="top-section">
           <div className='top-teamone-points'>
             <div>
