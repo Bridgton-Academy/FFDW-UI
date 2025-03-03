@@ -5,6 +5,21 @@ body {
     flex-direction: column;
 }
 
+.start-game-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    background-color: green;
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    margin-left: -17.5%;
+    width: 35%;
+    height: 25%;
+}
+
 .ff-logo {
     border: 1px solid black;
     width: 40%;
@@ -27,8 +42,10 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     padding: 0.5em;
     width: 200px;
+    height: 2.5em;
     border: 1px solid black;
 }
 
@@ -45,8 +62,10 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     padding: 0.5em;
     width: 200px;
+    height: 2.5em;
     border: 1px solid black;
 }
 
@@ -65,9 +84,11 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     padding: 0.5em;
     margin: 1em 0;
     width: 200px;
+    height: 2.5em;
     border: 1px solid black;
 }
 
@@ -75,11 +96,13 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     padding: 0.5em;
     margin: 1em 5em;
     font-size: 1.25em;
     font-weight: 900;
     width: 50px;
+    height: 50px;
     border: 1px solid black;
 }
 
@@ -87,9 +110,12 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     padding: 0.5em;
     margin: 1em 0;
     width: 200px;
+    height: 2.5em;
     border: 1px solid black;
+    
 }
 
