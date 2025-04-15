@@ -9,10 +9,14 @@ import Modal from 'react-modal';
 function gameBoard() { 
   
   const [gameQuestions, setGameQuestions] = useState(null);
+  const [totalRoundPoints, setTotalRoundPoints] = useState(0);
+
   const [teamNameModalIsOpen, setTeamNameModalIsOpen] = useState(true);
   const [startRoundModalIsOpen, setStartRoundModalIsOpen] = useState(false);
   const [stealModalIsOpen, setStealModalIsOpen] = useState(false);
   const [roundWinnerModalIsOpen, setRoundWinnerModalIsOpen] = useState(false);
+  const [gameEndModalIsOpen, setGameEndModalIsOpen] = useState(false);
+
   const [answerOneVisable, setAnswerOneVisable] = useState(false);
   const [answerTwoVisable, setAnswerTwoVisable] = useState(false);
   const [answerThreeVisable, setAnswerThreeVisable] = useState(false);
@@ -21,13 +25,17 @@ function gameBoard() {
   const [answerSixVisable, setAnswerSixVisable] = useState(false);
   const [answerSevenVisable, setAnswerSevenVisable] = useState(false);
   const [answerEightVisable, setAnswerEightVisable] = useState(false);
+
   const [firstStrikeVisable, setFirstStrikeVisable] = useState(false);
   const [secondStrikeVisable, setSecondStrikeVisable] = useState(false);
   const [thirdStrikeVisable, setThirdStrikeVisable] = useState(false);
+
   const [teamOnePoints, setTeamOnePoints] = useState(0);
   const [teamTwoPoints, setTeamTwoPoints] = useState(0);
+
   const [roundPoints, setRoundPoints] = useState(0); 
   const [roundNumber, setRoundNumber] = useState(0);
+
   const [offensiveTeam, setOffensiveTeam] = useState("");
   const [defensiveTeam, setDefensiveTeam] = useState("");
 
@@ -35,12 +43,14 @@ function gameBoard() {
   const password = 'Dv27232723';
   const base64_encoded_credentials = btoa(`${username}:${password}`);
 
-  
-  
   const [teamOneName, setTeamOneName] = useState('');
   const [teamTwoName, setTeamTwoName] = useState('');
   const [teamNames, setTeamNames] = useState('');
   
+
+
+  // TEAM NAMES
+
   const handleTeamOneChange = (event) => {
     setTeamOneName(event.target.value);
   };
@@ -49,14 +59,20 @@ function gameBoard() {
     setTeamTwoName(event.target.value);
   };
   
-  const handleSetTeamNames = () => {
+  const handleSetTeamNames = () => { 
     setTeamNames({ teamOne: teamOneName, teamTwo: teamTwoName });
     setOffensiveTeam(teamOneName)
     setDefensiveTeam(teamTwoName)
   };
 
+  // TEAM NAMES
 
 
+  
+
+
+
+  // ANSWERS
 
   function Answer(props) { 
     return <p>{props.visible === false ? "" : props.answer}</p>;
@@ -66,34 +82,93 @@ function gameBoard() {
     return <p>{props.visible === false ? "" : props.answer}</p>;
   }
 
+  // ANSWERS
+
+
+  // BOARD
+
+  function resetRoundBoard() {
+    setRoundPoints(0);
+    setAnswerOneVisable(false);
+    setAnswerTwoVisable(false);
+    setAnswerThreeVisable(false);
+    setAnswerFourVisable(false);
+    setAnswerFiveVisable(false);
+    setAnswerSixVisable(false);
+    setAnswerSevenVisable(false);
+    setAnswerEightVisable(false);
+    setFirstStrikeVisable(false);
+    setSecondStrikeVisable(false);
+    setThirdStrikeVisable(false);
+  }
+
+
+  // MODALS
+
   function closeTeamNameModal() {
     setTeamNameModalIsOpen(false);
-    handleSetTeamNames();
-    setStartRoundModalIsOpen(true);
+    if (teamOneName.trim().length === 0 || teamTwoName.trim().length === 0) {
+      alert('Please enter team names');
+      setTeamNameModalIsOpen(true);
+    } else {
+      handleSetTeamNames();
+      setStartRoundModalIsOpen(true);
+    }
+    
   }
 
   function closeStartRoundModal() {
     setStartRoundModalIsOpen(false);
     setRoundNumber(roundNumber + 1);
+    resetRoundBoard();
+    setTotalRoundPoints(gameQuestions[0].answeronepoints + gameQuestions[0].answertwopoints + gameQuestions[0].answerthreepoints + gameQuestions[0].answerfourpoints + gameQuestions[0].answerfivepoints + gameQuestions[0].answersixpoints + gameQuestions[0].answersevenpoints + gameQuestions[0].answereightpoints);
+    
   }
 
   function closeStealModal() {
     setStealModalIsOpen(false);
+    setOffensiveTeam(defensiveTeam);
+    setDefensiveTeam(offensiveTeam);
   }
 
   function closeRounderWinnerModal() {
-
+    setRoundWinnerModalIsOpen(false);
+    if (roundNumber >= 3) {
+      closeStartRoundModal();
+      setGameEndModalIsOpen(true);
+    } else {
+      setStartRoundModalIsOpen(true);
+    }
   }
+
+  function closeGameEndModal() {
+    setGameEndModalIsOpen(false);
+    resetRoundBoard();
+    setTeamOnePoints(0);
+    setTeamTwoPoints(0);
+    setTeamOneName('');
+    setTeamTwoName('');
+    setRoundNumber(0);
+    setTeamNameModalIsOpen(true);
+  }
+
+  // MODALS
+
+
+
+
+
+  // STEAL
 
   function stealSuccessful() {
     const points = roundPoints
     if (defensiveTeam === teamOneName) {
-      setTeamOnePoints(points)
+      setTeamOnePoints(teamOnePoints+points)
       closeStealModal()
       setRoundWinnerModalIsOpen(true)
     }
     if (defensiveTeam === teamTwoName) {
-      setTeamTwoPoints(points)
+      setTeamTwoPoints(teamTwoPoints+points)
       closeStealModal()
       setRoundWinnerModalIsOpen(true)
     }
@@ -102,17 +177,24 @@ function gameBoard() {
   function stealUnsuccessful() {
     const points = roundPoints
     if (offensiveTeam === teamOneName) {
-      setTeamOnePoints(points)
+      setTeamOnePoints(teamOnePoints+points)
       closeStealModal()
       setRoundWinnerModalIsOpen(true)
     }
     if (offensiveTeam === teamTwoName) {
-      setTeamTwoPoints(points)
+      setTeamTwoPoints(teamTwoPoints+points)
       closeStealModal()
       setRoundWinnerModalIsOpen(true)
     }
   }
   
+  // STEAL
+
+
+
+
+
+  // POINTS
 
   function PointAdder(props, visible) {
     if (visible === false) {
@@ -122,9 +204,18 @@ function gameBoard() {
     } 
   }
 
+  // POINTS
+
+
+
+  
+  
+  // STRIKES
+  
   function strikeHandler(strikeNumber) {
     switch (strikeNumber) {
       // TODO: If clicking first strike twice then second stike will be visable
+      // TODO: If misclicking strike, be able to remove strike
       case 1:
         setFirstStrikeVisable(true)
         break;
@@ -152,12 +243,50 @@ function gameBoard() {
     }
   }
 
+  // STRIKES
+
+
+
+
+    
+  useEffect(() => {
+    console.log('roundPoints', roundPoints);
+    if (roundPoints > 0 && roundPoints === totalRoundPoints) {
+      if (offensiveTeam === teamOneName) {
+        setOffensiveTeam(teamTwoName);
+        setDefensiveTeam(teamOneName);
+        setTeamOnePoints(teamOnePoints + roundPoints);
+        
+      } else if (offensiveTeam === teamTwoName) {
+        setOffensiveTeam(teamOneName);
+        setDefensiveTeam(teamTwoName);
+        setTeamTwoPoints(teamTwoPoints + roundPoints);
+        
+      }
+      setRoundWinnerModalIsOpen(true);
+    }
+  } , [roundPoints]);
+
     
   useEffect(() => {
     fetch('http://127.0.0.1:8000/question/', {headers: {'Authorization': `Basic ${base64_encoded_credentials}`}})
       .then(response => response.json())
       .then(data => setGameQuestions(data));
   } , []);
+
+  // useEffect(() => {
+  //   const dataToSend = {"answeronevisable": answerOneVisable, "answertwovisable": answerTwoVisable, "answerthreevisable": answerThreeVisable, "answerfourvisable": answerFourVisable, "answerfivevisable": answerFiveVisable, "answersixvisable": answerSixVisable, "answersevenvisable": answerSevenVisable, "answereightvisable": answerEightVisable};
+  //   console.log(JSON.stringify(dataToSend));
+  //   fetch('http://127.0.0.1:8000/question/', {
+  //     method: 'POST',
+  //     headers: {'Authorization': `Basic ${base64_encoded_credentials}`, 'Content-Type': 'application/json'},
+  //     body: JSON.stringify(dataToSend),
+  //   })
+  //     .then(response => response.json())
+  //     .then(data => console.log(data));
+
+  // }, [answerOneVisable, answerTwoVisable, answerThreeVisable, answerFourVisable, answerFiveVisable, answerSixVisable, answerSevenVisable, answerEightVisable]);
+  
 
   if (gameQuestions) {
     return (
@@ -177,6 +306,7 @@ function gameBoard() {
         <div>
           <Modal isOpen={startRoundModalIsOpen} onRequestClose={closeStartRoundModal} ariaHideApp={false} className="start-team-name-overlay">
             <p>Start Round {roundNumber+1}</p>
+            <p>{offensiveTeam} you are up!</p>
             <button onClick={closeStartRoundModal}>Start</button>
           </Modal>
         </div>
@@ -186,6 +316,22 @@ function gameBoard() {
             <p>{defensiveTeam} you get one guess to steal {offensiveTeam}'s points.</p>
             <button onClick={stealSuccessful}>Steal Successful</button> 
             <button onClick={stealUnsuccessful}>Steal Unsuccessful</button>
+          </Modal>
+        </div>
+        <div>
+          <Modal isOpen={roundWinnerModalIsOpen} onRequestClose={closeRounderWinnerModal} ariaHideApp={false} className="start-team-name-overlay">
+            <p>Round {roundNumber} Winner!</p>
+            <p>{teamOneName} you have {teamOnePoints} points!</p>
+            <p>{teamTwoName} you have {teamTwoPoints} points!</p>
+            <button onClick={closeRounderWinnerModal}>Continue</button>
+          </Modal>
+        </div>
+        <div>
+          <Modal isOpen={gameEndModalIsOpen} onRequestClose={closeGameEndModal} ariaHideApp={false} className="start-team-name-overlay">
+            <p>Game Over!</p>
+            <p>{teamOneName} Points: {teamOnePoints}</p>
+            <p>{teamTwoName} Points: {teamTwoPoints}</p>
+            <button onClick={closeGameEndModal}>Continue</button>
           </Modal>
         </div>
         
