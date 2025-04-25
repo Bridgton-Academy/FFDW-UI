@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import './page.css';
 import Modal from 'react-modal';
+import logo from './images/family-fued.png';
 
 
 
@@ -47,6 +48,7 @@ function gameBoard() {
   const [teamTwoName, setTeamTwoName] = useState('');
   const [teamNames, setTeamNames] = useState('');
   
+  const [gameQuestionIndex, setGameQuestionIndex] = useState(0);
 
 
   // TEAM NAMES
@@ -89,6 +91,7 @@ function gameBoard() {
 
   function resetRoundBoard() {
     setRoundPoints(0);
+    setTotalRoundPoints(0);
     setAnswerOneVisable(false);
     setAnswerTwoVisable(false);
     setAnswerThreeVisable(false);
@@ -120,8 +123,7 @@ function gameBoard() {
   function closeStartRoundModal() {
     setStartRoundModalIsOpen(false);
     setRoundNumber(roundNumber + 1);
-    resetRoundBoard();
-    setTotalRoundPoints(gameQuestions[0].answeronepoints + gameQuestions[0].answertwopoints + gameQuestions[0].answerthreepoints + gameQuestions[0].answerfourpoints + gameQuestions[0].answerfivepoints + gameQuestions[0].answersixpoints + gameQuestions[0].answersevenpoints + gameQuestions[0].answereightpoints);
+    setTotalRoundPoints(gameQuestions[gameQuestionIndex].answeronepoints + gameQuestions[gameQuestionIndex].answertwopoints + gameQuestions[gameQuestionIndex].answerthreepoints + gameQuestions[gameQuestionIndex].answerfourpoints + gameQuestions[gameQuestionIndex].answerfivepoints + gameQuestions[gameQuestionIndex].answersixpoints + gameQuestions[gameQuestionIndex].answersevenpoints + gameQuestions[gameQuestionIndex].answereightpoints);
     
   }
 
@@ -129,14 +131,21 @@ function gameBoard() {
     setStealModalIsOpen(false);
     setOffensiveTeam(defensiveTeam);
     setDefensiveTeam(offensiveTeam);
+    resetRoundBoard();
   }
 
   function closeRounderWinnerModal() {
     setRoundWinnerModalIsOpen(false);
+    resetRoundBoard();
+    if (gameQuestionIndex === gameQuestions.length) {
+      setGameQuestionIndex(0);
+    } else if (gameQuestionIndex < gameQuestions.length) {
+      setGameQuestionIndex(gameQuestionIndex + 1);
+    }
     if (roundNumber >= 3) {
       closeStartRoundModal();
       setGameEndModalIsOpen(true);
-    } else {
+    } else if (roundNumber < 3) {
       setStartRoundModalIsOpen(true);
     }
   }
@@ -250,7 +259,6 @@ function gameBoard() {
 
     
   useEffect(() => {
-    console.log('roundPoints', roundPoints);
     if (roundPoints > 0 && roundPoints === totalRoundPoints) {
       if (offensiveTeam === teamOneName) {
         setOffensiveTeam(teamTwoName);
@@ -277,13 +285,14 @@ function gameBoard() {
   // useEffect(() => {
   //   const dataToSend = {"answeronevisable": answerOneVisable, "answertwovisable": answerTwoVisable, "answerthreevisable": answerThreeVisable, "answerfourvisable": answerFourVisable, "answerfivevisable": answerFiveVisable, "answersixvisable": answerSixVisable, "answersevenvisable": answerSevenVisable, "answereightvisable": answerEightVisable};
   //   console.log(JSON.stringify(dataToSend));
-  //   fetch('http://127.0.0.1:8000/question/', {
+  //   fetch('http://127.0.0.1:8000/question/2', {
   //     method: 'POST',
+  //     mode: 'no-cors',
   //     headers: {'Authorization': `Basic ${base64_encoded_credentials}`, 'Content-Type': 'application/json'},
   //     body: JSON.stringify(dataToSend),
+
   //   })
   //     .then(response => response.json())
-  //     .then(data => console.log(data));
 
   // }, [answerOneVisable, answerTwoVisable, answerThreeVisable, answerFourVisable, answerFiveVisable, answerSixVisable, answerSevenVisable, answerEightVisable]);
   
@@ -291,6 +300,7 @@ function gameBoard() {
   if (gameQuestions) {
     return (
       <body>
+        
         <div>
           <Modal isOpen={teamNameModalIsOpen} onRequestClose={closeTeamNameModal} ariaHideApp={false} className="start-team-name-overlay">
             <label htmlFor="teamOne">Team One Name:</label>
@@ -299,23 +309,22 @@ function gameBoard() {
             <label htmlFor="teamTwo">Team Two Name:</label>
             <input type="text" id="teamTwo" value={teamTwoName} onChange={handleTeamTwoChange}/>
             <br />
-            <p>Start Game</p>
-            <button onClick={closeTeamNameModal}>Start</button>
+            <button onClick={closeTeamNameModal} className='start-game-button'>Start Game</button>
           </Modal>
         </div>
         <div>
           <Modal isOpen={startRoundModalIsOpen} onRequestClose={closeStartRoundModal} ariaHideApp={false} className="start-team-name-overlay">
-            <p>Start Round {roundNumber+1}</p>
+            <p>{gameQuestions[gameQuestionIndex].question}</p>
             <p>{offensiveTeam} you are up!</p>
-            <button onClick={closeStartRoundModal}>Start</button>
+            <button onClick={closeStartRoundModal} className='start-round-button'>Start Round {roundNumber+1}</button>
           </Modal>
         </div>
         <div>
           <Modal isOpen={stealModalIsOpen} onRequestClose={closeStealModal} ariaHideApp={false} className="start-team-name-overlay">
             <p>Steal!</p>
             <p>{defensiveTeam} you get one guess to steal {offensiveTeam}'s points.</p>
-            <button onClick={stealSuccessful}>Steal Successful</button> 
-            <button onClick={stealUnsuccessful}>Steal Unsuccessful</button>
+            <button onClick={stealSuccessful} className='start-round-button'>Steal Successful</button> 
+            <button onClick={stealUnsuccessful} className='start-round-button'>Steal Unsuccessful</button>
           </Modal>
         </div>
         <div>
@@ -323,7 +332,7 @@ function gameBoard() {
             <p>Round {roundNumber} Winner!</p>
             <p>{teamOneName} you have {teamOnePoints} points!</p>
             <p>{teamTwoName} you have {teamTwoPoints} points!</p>
-            <button onClick={closeRounderWinnerModal}>Continue</button>
+            <button onClick={closeRounderWinnerModal} className='start-round-button'>Continue</button>
           </Modal>
         </div>
         <div>
@@ -331,78 +340,80 @@ function gameBoard() {
             <p>Game Over!</p>
             <p>{teamOneName} Points: {teamOnePoints}</p>
             <p>{teamTwoName} Points: {teamTwoPoints}</p>
-            <button onClick={closeGameEndModal}>Continue</button>
+            <button onClick={closeGameEndModal} className='start-round-button'>New Game</button>
           </Modal>
         </div>
-        
+          
         <div className="ff-logo">
-          <img src="./images/family-fued.png" alt="Family Fued Logo" />
+          <img src="http://bridgtonacademy.org/wp-content/uploads/2025/04/BA_DWFF.png" alt="Logo" />
         </div>
-        <div className="top-section">
-            <div className='top-teamone-points'>
-              <div>
-                {teamNames.teamOne ? teamNames.teamOne : "Team 1"}
+        <div className="background">
+          <div className="top-section">
+              <div className='top-teamone-points'>
+                <div>
+                  {teamNames.teamOne ? teamNames.teamOne : "Team 1"}
+                </div>
+                <div>
+                  {teamOnePoints}
+                </div>
               </div>
-              <div>
-                {teamOnePoints}
+              <div className="top-round-info">
+                <div className="round-number-area">
+                  Round {roundNumber}
+                </div>
+                <div>
+                  {roundPoints}
+                </div>
               </div>
-            </div>
-            <div className="top-round-info">
-              <div className="round-number-area">
-                Round {roundNumber}
+              <div className="top-teamtwo-points">
+                <div>
+                  {teamNames.teamTwo ? teamNames.teamTwo : "Team 2"}
+                </div>
+                <div>
+                  {teamTwoPoints}
+                </div>
               </div>
-              <div>
-                {roundPoints}
-              </div>
-            </div>
-            <div className="top-teamtwo-points">
-              <div>
-                {teamNames.teamTwo ? teamNames.teamTwo : "Team 2"}
-              </div>
-              <div>
-                {teamTwoPoints}
-              </div>
-            </div>
-        </div>
-    
-        <div className="bottom-section"> 
-          <div className='left-questions-area'>
-            <div onClick={()=>[setAnswerOneVisable(!answerOneVisable), PointAdder(gameQuestions[0].answeronepoints, answerOneVisable)]}>
-              <Answer answer={gameQuestions[0].answerone} assignedpoints={gameQuestions[0].answeronepoints} visible={answerOneVisable}></Answer>
-            </div>
-            <div onClick={()=>[setAnswerTwoVisable(!answerTwoVisable), PointAdder(gameQuestions[0].answertwopoints, answerTwoVisable)]}>
-              <Answer answer={gameQuestions[0].answertwo} assignedpoints={gameQuestions[0].answertwopoints} visible={answerTwoVisable}></Answer>
-            </div>
-            <div onClick={()=>[setAnswerThreeVisable(!answerThreeVisable), PointAdder(gameQuestions[0].answerthreepoints, answerThreeVisable)]}>
-              <Answer answer={gameQuestions[0].answerthree} assignedpoints={gameQuestions[0].answerthreepoints} visible={answerThreeVisable}></Answer>
-            </div>
-            <div onClick={()=>[setAnswerFourVisable(!answerFourVisable), PointAdder(gameQuestions[0].answerfourpoints, answerFourVisable)]}>
-              <Answer answer={gameQuestions[0].answerfour} assignedpoints={gameQuestions[0].answerfourpoints} visible={answerFourVisable}></Answer>
-            </div>
           </div>
-          <div className="strikes-area">
-            <div onClick={()=>[strikeHandler(1)]}>
-              <XPost answer={"X"} visible={firstStrikeVisable}></XPost>
+      
+          <div className="bottom-section"> 
+            <div className='left-questions-area'>
+              <div onClick={()=>[setAnswerOneVisable(!answerOneVisable), PointAdder(gameQuestions[gameQuestionIndex].answeronepoints, answerOneVisable)]}>
+                <Answer answer={gameQuestions[gameQuestionIndex].answerone} assignedpoints={gameQuestions[gameQuestionIndex].answeronepoints} visible={answerOneVisable}></Answer>
+              </div>
+              <div onClick={()=>[setAnswerTwoVisable(!answerTwoVisable), PointAdder(gameQuestions[gameQuestionIndex].answertwopoints, answerTwoVisable)]}>
+                <Answer answer={gameQuestions[gameQuestionIndex].answertwo} assignedpoints={gameQuestions[gameQuestionIndex].answertwopoints} visible={answerTwoVisable}></Answer>
+              </div>
+              <div onClick={()=>[setAnswerThreeVisable(!answerThreeVisable), PointAdder(gameQuestions[gameQuestionIndex].answerthreepoints, answerThreeVisable)]}>
+                <Answer answer={gameQuestions[gameQuestionIndex].answerthree} assignedpoints={gameQuestions[gameQuestionIndex].answerthreepoints} visible={answerThreeVisable}></Answer>
+              </div>
+              <div onClick={()=>[setAnswerFourVisable(!answerFourVisable), PointAdder(gameQuestions[gameQuestionIndex].answerfourpoints, answerFourVisable)]}>
+                <Answer answer={gameQuestions[gameQuestionIndex].answerfour} assignedpoints={gameQuestions[gameQuestionIndex].answerfourpoints} visible={answerFourVisable}></Answer>
+              </div>
             </div>
-            <div onClick={()=>[strikeHandler(2)]}>
-              <XPost answer={"X"} visible={secondStrikeVisable}></XPost>
+            <div className="strikes-area">
+              <div onClick={()=>[strikeHandler(1)]}>
+                <XPost answer={"X"} visible={firstStrikeVisable}></XPost>
+              </div>
+              <div onClick={()=>[strikeHandler(2)]}>
+                <XPost answer={"X"} visible={secondStrikeVisable}></XPost>
+              </div>
+              <div onClick={()=>[strikeHandler(3)]}>
+                <XPost answer={"X"} visible={thirdStrikeVisable}></XPost>
+              </div>
             </div>
-            <div onClick={()=>[strikeHandler(3)]}>
-              <XPost answer={"X"} visible={thirdStrikeVisable}></XPost>
-            </div>
-          </div>
-          <div className='right-questions-area'>
-            <div onClick={()=>[setAnswerFiveVisable(!answerFiveVisable), PointAdder(gameQuestions[0].answerfivepoints, answerFiveVisable)]}>
-              <Answer answer={gameQuestions[0].answerfive} assignedpoints={gameQuestions[0].answerfivepoints} visible={answerFiveVisable}></Answer>
-            </div>
-            <div onClick={()=>[setAnswerSixVisable(!answerSixVisable), PointAdder(gameQuestions[0].answersixpoints, answerSixVisable)]}>
-              <Answer answer={gameQuestions[0].answersix} assignedpoints={gameQuestions[0].answersixpoints} visible={answerSixVisable}></Answer>
-            </div>
-            <div onClick={()=>[setAnswerSevenVisable(!answerSevenVisable), PointAdder(gameQuestions[0].answersevenpoints, answerSevenVisable)]}>
-              <Answer answer={gameQuestions[0].answerseven} assignedpoints={gameQuestions[0].answersevenpoints} visible={answerSevenVisable}></Answer>
-            </div>
-            <div onClick={()=>[setAnswerEightVisable(!answerEightVisable), PointAdder(gameQuestions[0].answereightpoints, answerEightVisable)]}>
-              <Answer answer={gameQuestions[0].answereight} assignedpoints={gameQuestions[0].answereightpoints} visible={answerEightVisable}></Answer>
+            <div className='right-questions-area'>
+              <div onClick={()=>[setAnswerFiveVisable(!answerFiveVisable), PointAdder(gameQuestions[gameQuestionIndex].answerfivepoints, answerFiveVisable)]}>
+                <Answer answer={gameQuestions[gameQuestionIndex].answerfive} assignedpoints={gameQuestions[gameQuestionIndex].answerfivepoints} visible={answerFiveVisable}></Answer>
+              </div>
+              <div onClick={()=>[setAnswerSixVisable(!answerSixVisable), PointAdder(gameQuestions[gameQuestionIndex].answersixpoints, answerSixVisable)]}>
+                <Answer answer={gameQuestions[gameQuestionIndex].answersix} assignedpoints={gameQuestions[gameQuestionIndex].answersixpoints} visible={answerSixVisable}></Answer>
+              </div>
+              <div onClick={()=>[setAnswerSevenVisable(!answerSevenVisable), PointAdder(gameQuestions[gameQuestionIndex].answersevenpoints, answerSevenVisable)]}>
+                <Answer answer={gameQuestions[gameQuestionIndex].answerseven} assignedpoints={gameQuestions[gameQuestionIndex].answersevenpoints} visible={answerSevenVisable}></Answer>
+              </div>
+              <div onClick={()=>[setAnswerEightVisable(!answerEightVisable), PointAdder(gameQuestions[gameQuestionIndex].answereightpoints, answerEightVisable)]}>
+                <Answer answer={gameQuestions[gameQuestionIndex].answereight} assignedpoints={gameQuestions[gameQuestionIndex].answereightpoints} visible={answerEightVisable}></Answer>
+              </div>
             </div>
           </div>
         </div>
